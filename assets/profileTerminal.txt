@@ -1,0 +1,102 @@
+export PATH=~/local/bin:~/bin:/usr/local/cuda/bin:/usr/local/bin:$PATH:/Applications/MATLAB_R2010b.app/bin:/usr/local/sbin
+
+export HISTIGNORE="cd:ls:ll:la:rm:[bf]g:clear"
+
+function fifi() { find . -name "*$@*" -print ;}
+
+clear='\[\e[0m\]'
+black='\[\e[0;30m\]'
+red='\[\e[0;31m\]'
+green='\[\e[0;32m\]'
+orange='\[\e[0;33m\]'
+blue='\[\e[0;34m\]'
+purple='\[\e[0;35m\]'
+cyan='\[\e[0;36m\]'
+white='\[\e[0;37m\]'
+Black='\[\e[1;30m\]'
+Red='\[\e[1;31m\]'
+Green='\[\e[1;32m\]'
+Orange='\[\e[1;33m\]'
+Blue='\[\e[1;34m\]'
+Purple='\[\e[1;35m\]'
+Cyan='\[\e[1;36m\]'
+White='\[\e[1;37m\]'
+PS1=$Black'['$Red'\u@macbook '$Orange'\w'$Black']'$clear'$ '
+
+export COPYFILE_DISABLE=true
+
+alias l='ls -GlF'
+alias ls='ls -GF'
+alias ll='ls -lhF'
+alias la='ls -ahF'
+alias lla='ls -lhaF'
+alias llr='ls -lhFrt'
+alias lls='ls -lhFrS'
+alias du='du -h'
+alias math=/Applications/Mathematica.app/Contents/MacOS/MathKernel
+alias astyle='astyle -onaUfs2 *.cpp *.hpp'
+alias ipy='ipython2.5'
+alias lua32='/Users/clement/lua32/usr/local/bin/qlua'
+alias xilinxvnc1="vncviewer -compresslevel 9 xilinx:5901"
+alias xilinxvnc2="vncviewer -compresslevel 9 xilinx:5902"
+alias ilua='xlua /Users/clement/sources/ilua.lua'
+alias edit='aquamacs'
+alias nb='ipython notebook --pylab=inline'
+
+export EDITOR='vi'
+export SVN_EDITOR='emacs'
+export SVN_NYU=svn+ssh://cf65@access.cims.nyu.edu/home/cf65/SVN
+export CNP=$SVN_NYU/cnp-custom
+export SVN_JS1=svn://js1.cs.nyu.edu/home/clement/SVN
+export NGC=$SVN_JS1/neuron-grid-computer
+export INSTALL_PREFIX=~/local
+
+export TMPDIR='/tmp/'
+
+export DISPLAY=0
+
+# source /opt/intel/mkl/bin/mklvars.sh intel64
+# export CMAKE_LIBRARY_PATH=$DYLD_LIBRARY_PATH
+# export CMAKE_INCLUDE_PATH=$INCLUDE
+
+export CUDA_INSTALL_PATH=/usr/local/cuda
+export CUDA_SDK_PATH="/Developper/GPU Computing"
+
+alias corona='/Applications/CoronaSDK/Corona\ Terminal'
+
+alias love="/Applications/love.app/Contents/MacOS/love"
+
+export PATH=/usr/local/share/npm/bin/:$PATH
+
+export PATH=$PATH:/Users/clement/Desktop/adt-bundle-mac-x86_64-20131030/sdk/tools:/Users/clement/Desktop/adt-bundle-mac-x86_64-20131030/sdk/platform-tools
+
+export JAVA_HOME=/usr
+
+echo -ne "\033]0;localhost\007"
+
+alias betty='~/tmp/betty/main.rb'
+
+export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+
+# save path on cd
+function cd {
+  builtin cd $@
+  pwd > ~/.last_dir
+}
+
+# restore last saved path
+if [ -f ~/.last_dir ]
+  then cd `cat ~/.last_dir`
+fi
+
+# Scala stuff
+export JAVA_TOOL_OPTIONS="-Dfile.encoding=utf8"
+export MAVEN_OPTS="-Xmx2048m -XX:MaxPermSize=256m"
+# `zinc -J"-Xmx4G" -nailed`
+export SBT_PROXY_REPO=http://artifactory.local.twitter.com/repo/
+
+# TH / Madbits
+export PATH=~/torch/bin:$PATH
+
+# HADOOP
+export HADOOP_HOME=/opt/twitter/Cellar/hadoop/2.6.0/libexec
