@@ -1,4 +1,5 @@
 require 'xlua'
+
 -- killall -9 lua
 local json = require 'cjson'
 local col = require 'async.repl'.colorize
@@ -11,6 +12,7 @@ local rickPath = 'assets/images/rick.jpg'
 local turrellPath = 'assets/images/rick.jpg'
 local rick = pixels.load(rickPath)
 local turrell = pixels.load(turrellPath)
+-- print(turrell)
 local MAD = {}
 
 --[[
@@ -23,7 +25,6 @@ type = 'float',
 channels = 3,
 })
 ]]
-
 
 MAD.extensions = {
    videos = {
@@ -104,6 +105,29 @@ MAD.patch = {
 }
    -- torch.save(training.fs.id2hue_fresh, id2hue_fresh)
 
+MAD.file = {}
+function MAD.file.isvid(file)
+   file = string.lower(file)
+   local is = false
+   for _, ext in ipairs(MAD.extensions.videos) do
+      if string.find(file, ext) then
+         is = true
+         if is then break end
+      end
+   end
+   return is
+end
+function MAD.file.isimg(file)
+   file = string.lower(file)
+   local is = false
+   for _, ext in ipairs(MAD.extensions.images) do
+      if string.find(file, ext) then
+         is = true
+         if is then break end
+      end
+   end
+   return is
+end
 function MAD.csv2infos(opt)
    -- https://help.github.com/articles/associating-text-editors-with-git/
    -- /tmp/
@@ -599,7 +623,7 @@ function MAD.range(min,max,step)
    return range
 end
 function MAD.removeEmpty(idir)
-   local command = 'cd "'..idir..'"&& find . -empty -type d -delete'
+   local command = 'cd "'..idir..'"&&   '
    os.execute(command)
 end
 function MAD.sample(array)
@@ -1001,6 +1025,7 @@ function MAD.uids.make(n, ofile)
 end
 function MAD.uids.getn(n, fuids)
    local uids = require(fuids)
+   local fcsv = stringx.replace(fuids, '.th', '.csv')
    local olist = {}
    for i=1, n do
       table.insert(olist, uids[i])
@@ -1011,18 +1036,13 @@ function MAD.uids.getn(n, fuids)
       table.insert(uidsLeft, uids[i])
    end
    torch.save(fuids, uidsLeft)
+   require('csv').save( fcsv, { uid = uidsLeft } )
    print(col.Red(#uidsLeft), 'uids left')
    return olist
 end
 function MAD.uids.elias()
    return string.lower(os.tmpname():gsub('/tmp/lua_', ''))
 end
-
-MAD.file = {
-   save = {},
-}
-
-
 function MAD.tojson(file, table)
    local json = require 'cjson'
    local j = json.encode(table)
@@ -1619,7 +1639,7 @@ function MAD.dir.images.files(idir, limit)
       if res then
          n = n + 1
          table.insert(list,file)
-         io.write(col.Green(n),' Images \r') io.flush()
+         -- io.write(col.Green(n),' Images \r') io.flush()
       end
       if limit then
          if n > limit then
@@ -1627,7 +1647,7 @@ function MAD.dir.images.files(idir, limit)
          end
       end
    end
-   print('\n')
+   -- print('\n')
    return list
 end
 function MAD.dir.images.deleteTosmall(idir)
@@ -2206,13 +2226,13 @@ function MAD.mosaic.mean(opt)
       print( stringx.rjust(string, 30), col.Blue(value))
    end
 
-   p('name',path.basename(fmosaic))
-   p('n',nfiles)
-   p('Grid:',nCol..' * '..nRow)
-   p('Tiles', tileWidth..' * '..tileHeight)
-   p('Mosaic', w..' * '..h)
-   p('fmosaic',fmosaic)
-   p('fmean',fmean)
+   -- p('name',path.basename(fmosaic))
+   -- p('n',nfiles)
+   -- p('Grid:',nCol..' * '..nRow)
+   -- p('Tiles', tileWidth..' * '..tileHeight)
+   -- p('Mosaic', w..' * '..h)
+   -- p('fmosaic',fmosaic)
+   -- p('fmean',fmean)
 
    local counter = 1
    for i = 1,nRow do
@@ -2314,16 +2334,27 @@ function MAD.mosaic.meanApply(d0)
    local od0 = d0..'.MOMU'
    dir.makepath(od0)
    local d1s = dir.getdirectories(d0)
-   print(d1s)
+   -- print(d1s)
    for i, d1 in ipairs(d1s) do
-      MAD.dir.images.mosaicAndMean({
-         files = MAD.dir.images.files(d1),
-         fmosaic = path.join(od0, path.basename(d1)..'.mo.jpg'),
-         fmean = path.join(od0, path.basename(d1)..'.mu.jpg'),
-         tileWidth = 64,
-         tileHeight = 64,
-         mosaicRatio = 1,
-      })
+      xlua.progress(i, #d1s)
+      print(d1)
+      local fmosaic = path.join(od0, path.basename(d1)..'.mo.jpg')
+      local fmean = path.join(od0, path.basename(d1)..'.mu.jpg')
+      if not path.exists(fmosaic) or not path.exists(fmean) then
+         local files = MAD.dir.images.files(d1)
+         if #files > 0 then 
+            local ok = pcall(function()
+                  MAD.mosaic.mean({
+                     files = files,
+                     fmosaic = fmosaic,
+                     fmean = fmean,
+                     tileWidth = 128,
+                     tileHeight = 128,
+                     mosaicRatio = 1,
+                  })
+            end)
+         end
+      end
    end
 end
 MAD.rdm = {}
