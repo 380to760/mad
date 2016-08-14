@@ -1,5 +1,4 @@
 require 'xlua'
-
 -- killall -9 lua
 local json = require 'cjson'
 local col = require 'async.repl'.colorize
@@ -1589,7 +1588,7 @@ function MAD.dir.images.bin(pdir,binSize)
 
    -- Args
    local binSize = binSize or 10000
-   local extension = extension or '.ts'
+   -- local extension = extension or '.ts'
 
    -- Folders
    local idir = pdir..'-TEMP'
@@ -1639,7 +1638,7 @@ function MAD.dir.images.files(idir, limit)
       if res then
          n = n + 1
          table.insert(list,file)
-         -- io.write(col.Green(n),' Images \r') io.flush()
+         io.write(col.Green(n),' Images \r') io.flush()
       end
       if limit then
          if n > limit then
@@ -1869,14 +1868,12 @@ function MAD.dir.images.toJpg(idir)
    local files = MAD.dir.images.files(idir)
    for i, file in ipairs(files) do
       xlua.progress(i, #files)
-     local img = pixels.load(file, {
-         type = 'float',
-         channels = 3,
-      })
       if string.find(string.lower(file), 'png') then
-         dir.movefile(file, file:gsub('PNG','jpg'):gsub('png','jpg'))
-      else
-         pixels.save(file, img)
+         local img = pixels.load(file, {
+            type = 'float',
+            channels = 3,
+         })         
+         pixels.save(stringx.replace(file, '.png', '.jpg'), img)
       end
    end
 end
